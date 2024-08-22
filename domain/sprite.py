@@ -10,7 +10,6 @@ class Sprite(pg.sprite.Sprite):
         self.size = size
         self.rect = pg.Rect(size)
         self.rect.top_left = pos
-        self.on_click = {1: None, 2: None}
         self.cursor_state = None
     
     @property
@@ -30,6 +29,18 @@ class Sprite(pg.sprite.Sprite):
     @pos.setter
     def pos(self, pos): self.rect.top_left = pos
     
+    def on_left_click(self):
+        '''Exists to be overridden. Will be called if the sprite is left-clicked.'''
+        pass
+    
+    def on_middle_click(self):
+        '''Exists to be overridden. Will be called if the sprite is middle-clicked.'''
+        pass    
+    
+    def on_right_click(self):
+        '''Exists to be overridden. Will be called if the sprite is right-clicked.'''
+        pass    
+    
     def is_clicked(self, event, button=1):
         '''Use to determine if a given event represents a click on the sprite.'''
         if event.type != pg.MOUSEBUTTONDOWN: return False
@@ -38,7 +49,10 @@ class Sprite(pg.sprite.Sprite):
         
     def events(self, events):
         for event in events:
-            if self.is_clicked(event): self.on_click[event.button](self)
+            if self.is_clicked(event):
+                if event.button == 1: self.on_left_click()
+                if event.button == 2: self.on_middle_click()
+                if event.button == 3: self.on_right_click()
             
     def updates(self):
         if self.mouse_over: self.game.cursor.state = self.cursor_state

@@ -66,10 +66,10 @@ class AnimatedSprite(Sprite):
         self.animations = {}
         self.frame_queue = []
         self.paused = False
-        
-        self.__pos = self.pos
-    @property
-    def pos(return self.__pos + self.
+    
+    def on_idle(self):
+        '''Exists to be overriden. Will be called every frame whilst sprite is idle.'''
+        pass
     
     def queue_animation(self, animation, duration=None):
         if not animation in self.animations.values(): raise ValueError(f"Unrecognised Animation of {self}: {animation}")
@@ -90,7 +90,7 @@ class AnimatedSprite(Sprite):
         self.anim_paused = True
         
     def is_idle(self):
-        '''Use to determine whether the sprite has naturally run out of frames (and should loop its idle.)'''
+        '''Use to determine whether the sprite has naturally run out of frames and should call its on_idle.'''
         return len(self.frame_queue) == 0 and self.anim_paused
         
     def update_frame(self):
@@ -101,6 +101,7 @@ class AnimatedSprite(Sprite):
     def update(self):
         '''Overridden updates loop.'''
         super().updates()
+        if self.is_idle: self.on_idle()
         self.update_frame()
             
             
