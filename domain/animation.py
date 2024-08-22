@@ -8,7 +8,7 @@ class Animation:
         # Initialise Attributes:
         self.frames = []
     
-    def load_from_path(self, path):
+    def load_from_dir(self, path):
         '''Use to load all images in a given directory into the animation.'''
         # Path should be to a folder of images representing unique animation frames.
         self.frames = []
