@@ -1,7 +1,7 @@
 import pygame as pg
 from domain.animation import Animation, AnimatedSprite
 
-class Cursor:
+class Cursor(AnimatedSprite):
     def __init__(self):
         super().__init__(self, framerate)
     
