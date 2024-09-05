@@ -66,7 +66,7 @@ class GemCost:
         
     def __lt__(self, other):
         if not isinstance(other, Cost): raise TypeError(f"Unsupported types for '<': {type(self)} and {type(other)}")
-        return int(self) == int(other)
+        return int(self) < int(other)
               
 class BaseCardInfo:
     def __init__(self, card_id, name, cost, rarity, scrybes, tribes, sigils, traits, power, health, evolution, sigil_targets):
@@ -165,14 +165,20 @@ class BaseCardRepo:
     
     def find_by_id(self, card_id):
         '''Returns a base card with the given id. Returns None if none exists.'''
-        # Added just for completeness. This should never be necessary since all cards should point to their base info.
+        # For use when loading from save.
         for card in self.cards:
             if card.card_id == card_id: return card
+        return None
+        
+    def find_by_name(self, card_name):
+        '''Returns a base card with the given name. Returns None if none exists.'''
+        # For use when initialising from spreadsheet data.
+        for card in self.cards:
+            if card.name == card_name: return card
         return None
     
     def __get_search_card(self, kwargs):
         '''Use to convert dictionary of kwargs into a RepoSearchCard object.'''
-        # Pass the kwargs as a dictionary.
         rsc = RepoSearchCard()
         if 'card_id' in **kwargs: rsc.card_id = kwargs['card_id']
         if 'name' in **kwargs: rsc.name = kwargs['name']
