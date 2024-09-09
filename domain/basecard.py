@@ -207,6 +207,16 @@ class BaseCardRepo:
         bcr = BaseCardRepo()
         bcr.cards = results
         return bcr
+        
+    def exclude(self, **kwargs):
+        '''Use to poll the repo for all cards which do not match the specified criteria.'''
+        results = []
+        rsc = self.__get_search_card(kwargs)
+        for card in self.cards:
+            if not card == rsc: results.append(card)
+        bcr = BaseCardRepo()
+        bcr.cards = results
+        return bcr
     
     def at_most(self, **kwargs):
         '''Use to poll the repo for all cards which have attributes at most the specified criteria.'''
