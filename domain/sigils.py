@@ -1,20 +1,34 @@
 import importlib
+import pygame as pg
+from scripts.separate_spritesheet import separate_spritesheet
 
 class SigilInfo:
 	def __init__(self, sigil_id, name, scrybes, description, triggers, is_mox, is_conduit, is_active, has_mirror, can_stack):
+        # Initialise Attributes:
+        def func(*args): pass
         self.sigil_id = sigil_id
         self.name = name
         self.scrybes = scrybes
         self.description = description
-        self.triggers = triggers
-        self.effects = {}
+        self.effects = {trigger: func for trigger in triggers}
         self.is_mox = is_mox
         self.is_conduit = is_conduit
         self.is_active = is_active
         self.has_mirror = has_mirror
         self.can_stack = can_stack
-        # self.load_effects()
-        
+        # Import Sigil Effects:
+        self.load_effects()
+        self.image = None
+        self.mirrored = None
+    
+    @property
+    def triggers(self): return set(self.effects.keys())
+    
+    def load_effects(self):
+        sigil = importlib.import_module(f"scripts.sigils.{self.name.lower().replace(" ", "_")}')
+        for trigger in self.triggers:
+            self.effects[trigger] = getattr(sigil, "on_"+trigger)
+    
 class RepoSearchSigil:
     def __init__(self):
         self.sigil_id = None
@@ -125,8 +139,22 @@ class SigilRepo:
         sr.sigils = results
         return sr
         
-    def merge_search(self, sigils):
+    def merge_search(self, sigilrepo):
         '''Use to collate the sigils in two searches.'''
         sr = SigilRepo()
         sr.sigils = self.sigils.union(sigilrepo.sigils)
         return sr
+        
+    def load_images(self, path, flip):
+        '''Updates all the sigil info with their relevant sprites taken from specified spritesheets.'''
+        sprites = separate_spritesheet(path)
+        flipped = separate_spritesheet(flip)
+        m = len(self.sigils)
+        n = len(sprites)
+        o = len(flipped)
+        if m != n: raise ValueError("Repo and spritesheet have different sizes; cannot collate their images.")
+        if m != o: raise ValueError("Repo and flipped spritesheet have different sizes; cannot collate their images.")
+        for i in range(n):
+            self.sigils[i].image = sprites[i]
+            self.sigils[i].mirrored = sprites[i]
+            if self.sigils[i].has_mirror: self.sigils[i].mirrored = flipped[i]

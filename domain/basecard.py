@@ -89,12 +89,18 @@ class BaseCardInfo:
         self.evolution = evolution
         self.sigil_targets = sigil_targets
         self.__portraitpath = None
+        self.__emissionpath = None
         
     @property
     def portrait(self):
         '''Dynamically loads portrait for memory save. Call sparingly.'''
         return pg.image.load(os.path.join('images', 'portraits', self.__portraitpath))
-    
+        
+    @property
+    def emission(self):
+        '''Dynamically loads emission portrait for memory save. Call sparingly.'''
+        return pg.image.load(os.path.join('images', 'portraits', self.__emissionpath))
+        
     def __lt__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '<': {type(self)} and {type(other)}.")
         return self.card_id < other.card_id
