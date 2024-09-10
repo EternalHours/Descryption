@@ -10,7 +10,7 @@ class Cost:
         self.links = links if links else 0
         self.gold = gold if gold else 0
         
-    def is_subcost(self, other):
+    def is_subcost(self, other, exclusive=False):
         '''Use to determine if this cost is encompassed by another. Should be used instead of < for comparison.'''
         if not isinstance(other, Cost): raise TypeError(f"Cannot be a subcost of objects of type: {type(other)}")
         if self.blood > other.blood: return False
@@ -19,6 +19,7 @@ class Cost:
         if self.energy > other.energy: return False
         if self.links > other.links: return False
         if self.gold > other.gold: return False
+        if exclusive: return not self == other
         return True
     
     def __int__(self):
@@ -30,8 +31,9 @@ class Cost:
         return int(self) == int(other)
         
     def __lt__(self, other):
+        '''Use only for sorting. Use is_subcost for comparison.'''
         if not isinstance(other, Cost): raise TypeError(f"Unsupported types for '<': {type(self)} and {type(other)}")
-        return int(self) == int(other)
+        return int(self) < int(other)
         
 class GemCost:
     def __init__(self, black=False, green=False, orange=False, blue=False, plusone=False):
@@ -117,47 +119,38 @@ class RepoSearchCard:
 
     def __req__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '=': {type(other)} and {type(self)}")
-        if self.card_id is not None and self.card_id != other.card_id: return False
-        if self.name is not None and self.name != other.name: return False
-        if self.cost is not None and self.cost != other.cost: return False
-        if self.rarity is not None and self.rarity != other.rarity: return False
-        if self.scrybes is not None and self.scrybes != other.scrybes: return False
-        if self.tribes is not None and self.tribes != other.tribes: return False
-        if self.sigils is not None and self.sigils != other.sigils: return False
-        if self.traits is not None and self.traits != other.traits: return False
-        if self.power is not None and self.power != other.power: return False
-        if self.health is not None and self.health != other.health: return False
+        attributes = {'card_id', 'name', 'cost', 'rarity', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        for attribute in attributes:
+            this = getattr(self, attribute)
+            that = getattr(other, attribute)
+            if this is not None and this != that: return False
         return True
         
     def __rle__(self, other):
-        # Note that this takes the form: other < self so the logic is inverted.
-        if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '<': {type(other)} and {type(self)}")
-        if self.card_id is not None and self.card_id < other.card_id: return False
-        if self.name is not None and self.name < other.name: return False
-        if self.cost is not None and not other.is_subcost(self.cost): return False
-        if self.rarity is not None and self.rarity < other.rarity: return False
-        if self.scrybes is not None and not other.scrybes.issubset(self.scrybes): return False
-        if self.tribes is not None and other.tribes.issubset(self.tribes): return False
-        if self.sigils is not None and other.sigils.issubset(self.sigils): return False
-        if self.traits is not None and other.traits.issubset(self.traits): return False
-        if isinstance(self.power, int) and isinstance(other.power, int) and self.power < other.power: return False
-        if isinstance(self.health, int) is not None and isinstance(other.health, int) and self.health < other.health: return False
+        # Note that this takes the form: other <= self so the logic is inverted.
+        if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '<=': {type(other)} and {type(self)}")
+        attributes = {'card_id', 'name', 'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        for attribute in attributes:
+            this = getattr(self, attribute)
+            that = getattr(other, attribute)
+            if this is not None:
+                if isinstance(this, set) and that.issubset(this): return False
+                elif isinstance(this, cost) and this.is_subcost(that, exclusive=True): return False
+                elif this < that: return False
         return True
 
     def __rge__(self, other):
-        # Note that this takes the form: other > self so the logic is inverted.
-        if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '>': {type(other)} and {type(self)}")
-        if self.card_id is not None and self.card_id > other.card_id: return False
-        if self.name is not None and self.name > other.name: return False
-        if self.cost is not None and not self.is_subcost(other.cost): return False
-        if self.rarity is not None and self.rarity > other.rarity: return False
-        if self.scrybes is not None and not other.scrybes.issuperset(self.scrybes): return False
-        if self.tribes is not None and other.tribes.issuperset(self.tribes): return False
-        if self.sigils is not None and other.sigils.issuperset(self.sigils): return False
-        if self.traits is not None and other.traits.issuperset(self.traits): return False
-        if isinstance(self.power, int) and isinstance(other.power, int) and self.power > other.power: return False
-        if isinstance(self.health, int) is not None and isinstance(other.health, int) and self.health > other.health: return False
-        return True
+        # Note that this takes the form: other >= self so the logic is inverted.
+        if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '>=': {type(other)} and {type(self)}")
+        attributes = {'card_id', 'name', 'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        for attribute in attributes:
+            this = getattr(self, attribute)
+            that = getattr(other, attribute)
+            if this is not None:
+                if isinstance(this, set) and that.issuperset(this): return False
+                elif isinstance(this, cost) and this.is_subcost(this, exclusive=True): return False
+                elif this > that: return False
+        return True 
         
 class BaseCardRepo:
     def __init__(self):
@@ -179,24 +172,15 @@ class BaseCardRepo:
     
     def __get_search_card(self, kwargs):
         '''Use to convert dictionary of kwargs into a RepoSearchCard object.'''
+        attributes = {'card_id', 'name', 'cost', 'blood', 'bones', 'energy', 'gems', 'links', 'gold', 'rarity', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         rsc = RepoSearchCard()
-        if 'card_id' in **kwargs: rsc.card_id = kwargs['card_id']
-        if 'name' in **kwargs: rsc.name = kwargs['name']
-        if 'cost' in kwargs: rsc.cost = kwargs['cost']
-        elif 'blood' in kwargs: rsc.cost = Cost(blood = kwargs['blood'])
-        elif 'bones' in kwargs: rsc.cost = Cost(bones = kwargs['bones'])
-        elif 'gems' in kwargs: rsc.cost = Cost(gems = kwargs['gems'])
-        elif 'energy' in kwargs: rsc.cost = Cost(energy = kwargs['energy'])
-        elif 'links' in kwargs: rsc.cost = Cost(links = kwargs['links'])
-        elif 'gold' in kwargs: rsc.cost = Cost(gold = kwargs['gold'])
-        if 'rarity' in kwargs: rsc.rarity = kwargs['rarity']
-        if 'scrybes' in kwargs: rsc.scrybes = kwargs['scrybes']
-        if 'tribes' in kwargs: rsc.tribes = kwargs['tribes']
-        if 'sigils' in kwargs: rsc.sigils = kwargs['sigils']
-        if 'traits' in kwargs: rsc.traits = kwargs['traits']
-        if 'power' in kwargs: rsc.power = kwargs['power']
-        if 'health' in kwargs: rsc.health = kwargs['health']
-        return rsc
+        for kwarg in kwargs:
+            if kwarg not in attributes: raise KeyError(f"Unrecognised attribute of RepoSearchCard: '{kwarg}'.")
+            if kwarg not in {'blood', 'bones', 'energy', 'gems', 'links', 'gold'}: setattr(rsc, kwarg, kwargs[kwarg])
+            else:
+                cost = Cost()
+                setattr(cost, kwarg, kwargs[kwarg])
+                rsc.cost = cost
     
     def match_to(self, **kwargs):
         '''Use to poll the repo for all cards which exactly match the specified criteria.'''
@@ -237,5 +221,11 @@ class BaseCardRepo:
         bcr = BaseCardRepo()
         bcr.cards = results
         return bcr
+        
+    def merge_search(self, basecardrepo):
+        '''Use to collate the cards in two searches.'''
+        bsc = BaseCardRepo()
+        bsc.cards = self.cards.union(basecardrepo.cards)
+        return bsc
         
         
