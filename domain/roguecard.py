@@ -1,6 +1,7 @@
 import copy
 from domain.basecard import Cost, BaseCard
 from domain.sigils import SigilGroup
+from domain.traits import Traits
 
 class RogueCard:
     '''Exists to be a container for attributes of cards which may change across the duration of a Rogue run.'''
@@ -18,6 +19,7 @@ class RogueCard:
         self.__evolution = None
         self.__sigil_targets = copy.deepcopy(self.basecard.sigil_targets)
         self.__portraitpath = None # TODO
+        self.__image = None
         
     @property
     def name(self):
@@ -64,6 +66,11 @@ class RogueCard:
         if self.__evolution is None: return self.basecard.evolution
         return self.__evolution
         
+    @property
+    def image(self)
+        if self.__image is None: self.render()
+        return self.__image
+    
     @name.setter
     def name(self, name):
         if name is None: self.__name = None
@@ -78,10 +85,9 @@ class RogueCard:
         
     @traits.setter
     def traits(self, traits):
-        #
-        # TODO: Type enforcing to set of traits
-        #
-        self.__traits = traits
+        if traits is None: self.__traits = None
+        if not isinstance(traits, set): raise TypeError(f"Could not set traits of RogueCard to object of type {type(traits)}.")
+        else: self.__traits = traits
         
     @power.setter
     def power(self, power):
@@ -101,7 +107,15 @@ class RogueCard:
         elif isinstance(evolution, BaseCard): self.__evolution = evolution.card_id
         elif not isinstance(evolution, (str, int)): raise TypeError(f"Could not set evolution of RogueCard to object of type {type(evolution)}.")
         else: self.__evolution = evolution
-
+    
+    def render(self):
+        costicon = self.cost.image
+        cardblank = Traits.get_cardblank(self.traits)
+        portrait = self.basecard.portrait
+        #
+        #   TODO
+        #
+        
     def copy(self):
         '''Creates a new copy of this rogue card with all the same modifications.'''
         card = RogueCard(self.basecard)

@@ -22,13 +22,7 @@ class Cost:
         self.links = links if links else 0
         self.gold = gold if gold else 0
         
-    def is_subcost(self, other, exclusive=False):
-        '''Use to determine if this cost is encompassed by another. Should be used instead of < or <= for comparison.'''
-        if self == other: return not exclusive
-        for attribute in ['blood', 'bones', 'gems', 'energy', 'links', 'gold']:
-            if getattr(self, attribute) > getattr(other, attribute): return False
-        return True
-    
+    @property
     def image(self):
         '''Returns the icon which represents this cost. loads all into centralised memory to minimise repeat loads/data.'''
         if Cost.images is None: Cost.load_images()
@@ -36,6 +30,13 @@ class Cost:
             index = int(getattr(self, attribute)) - 1
             if index >= 0: return Cost.images[attribute][index]
             return None
+        
+    def is_subcost(self, other, exclusive=False):
+        '''Use to determine if this cost is encompassed by another. Should be used instead of < or <= for comparison.'''
+        if self == other: return not exclusive
+        for attribute in ['blood', 'bones', 'gems', 'energy', 'links', 'gold']:
+            if getattr(self, attribute) > getattr(other, attribute): return False
+        return True
     
     def __iter__(self): return iter(self.blood, self.bones, self.gems, self.energy, self.links, self.gold)
     
@@ -98,6 +99,7 @@ class BaseCardInfo:
         self.card_id = card_id
         self.name = name
         self.cost = cost
+        self.rarity = rarity
         self.scrybes = scrybes
         self.tribes = tribes
         self.sigils = sigils
@@ -131,8 +133,6 @@ class BaseCardInfo:
 class RepoSearchCard:
     def __init__(self):
         '''Exists to use as comparison to BaseCardInfo for filtering.'''
-        self.card_id = None
-        self.name = None
         self.cost = None
         self.scrybes = None
         self.tribes = None
@@ -143,7 +143,7 @@ class RepoSearchCard:
 
     def __req__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '=': {type(other)} and {type(self)}")
-        attributes = {'card_id', 'name', 'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        attributes = {'cost', 'rarity', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         for attribute in attributes:
             this = getattr(self, attribute)
             that = getattr(other, attribute)
@@ -153,7 +153,7 @@ class RepoSearchCard:
     def __rle__(self, other):
         # Note that this takes the form: other <= self so the logic is inverted.
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '<=': {type(other)} and {type(self)}")
-        attributes = {'card_id', 'name', 'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        attributes = {'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         for attribute in attributes:
             this = getattr(self, attribute)
             that = getattr(other, attribute)
@@ -166,7 +166,7 @@ class RepoSearchCard:
     def __rge__(self, other):
         # Note that this takes the form: other >= self so the logic is inverted.
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '>=': {type(other)} and {type(self)}")
-        attributes = {'card_id', 'name', 'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        attributes = {'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         for attribute in attributes:
             this = getattr(self, attribute)
             that = getattr(other, attribute)
