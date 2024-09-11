@@ -17,4 +17,3 @@ def separate_spritesheet(self, path, sprite_size):
         j += y + 1
         i = 1
     return sprites
-            

@@ -11,7 +11,7 @@ class Cost:
         self.gold = gold if gold else 0
         
     def is_subcost(self, other, exclusive=False):
-        '''Use to determine if this cost is encompassed by another. Should be used instead of < for comparison.'''
+        '''Use to determine if this cost is encompassed by another. Should be used instead of < or <= for comparison.'''
         if not isinstance(other, Cost): raise TypeError(f"Cannot be a subcost of objects of type: {type(other)}")
         if self.blood > other.blood: return False
         if self.bones > other.bones: return False
@@ -78,7 +78,6 @@ class BaseCardInfo:
         self.card_id = card_id
         self.name = name
         self.cost = cost
-        self.rarity = rarity
         self.scrybes = scrybes
         self.tribes = tribes
         self.sigils = sigils
@@ -115,7 +114,6 @@ class RepoSearchCard:
         self.card_id = None
         self.name = None
         self.cost = None
-        self.rarity = None
         self.scrybes = None
         self.tribes = None
         self.sigils = None
@@ -125,7 +123,7 @@ class RepoSearchCard:
 
     def __req__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '=': {type(other)} and {type(self)}")
-        attributes = {'card_id', 'name', 'cost', 'rarity', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        attributes = {'card_id', 'name', 'cost', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         for attribute in attributes:
             this = getattr(self, attribute)
             that = getattr(other, attribute)
