@@ -1,7 +1,19 @@
 import os
 import pygame as pg
+from scripts.separate_spritesheet import separate_spritesheet
 
 class Cost:
+    images = None
+    
+    def load_images()
+        images = separate_spritesheet(os.path.join('images', 'costs.png'))
+        binders = ['blood', 'bones', 'gems', 'energy', 'links', 'gold']
+        cost_images = {binder: [] for binder in binders}
+        for i in range(len(images)):
+            binder = binders[i % 6]
+            cost_images[binder].append(images[i])
+        Cost.images = cost_images
+
     def __init__(self, blood=None, bones=None, gems=None, energy=None, links=None, gold=None):
         self.blood = blood if blood else 0
         self.bones = bones if bones else 0
@@ -12,19 +24,24 @@ class Cost:
         
     def is_subcost(self, other, exclusive=False):
         '''Use to determine if this cost is encompassed by another. Should be used instead of < or <= for comparison.'''
-        if not isinstance(other, Cost): raise TypeError(f"Cannot be a subcost of objects of type: {type(other)}")
-        if self.blood > other.blood: return False
-        if self.bones > other.bones: return False
-        if not self.gems.is_subcost(other.gems): return False
-        if self.energy > other.energy: return False
-        if self.links > other.links: return False
-        if self.gold > other.gold: return False
-        if exclusive: return not self == other
+        if self == other: return not exclusive
+        for attribute in ['blood', 'bones', 'gems', 'energy', 'links', 'gold']:
+            if getattr(self, attribute) > getattr(other, attribute): return False
         return True
+    
+    def image(self):
+        '''Returns the icon which represents this cost. loads all into centralised memory to minimise repeat loads/data.'''
+        if Cost.images is None: Cost.load_images()
+        for attribute in ['blood', 'bones', 'gems', 'energy', 'links', 'gold']:
+            index = int(getattr(self, attribute)) - 1
+            if index >= 0: return Cost.images[attribute][index]
+            return None
+    
+    def __iter__(self): return iter(self.blood, self.bones, self.gems, self.energy, self.links, self.gold)
     
     def __int__(self):
         '''Use only to quickly determine equality and sort order.'''
-        return self.gold + self.links * 8 + self.energy * 64 + int(self.gems) * 256 + self.bones * 4192 + self.blood * 67072
+        return self.gold + self.blood * 3 + self.links * 12 + self.energy * 60 + self.gems * 360 + self.bones * 4320
         
     def __eq__(self, other):
         if not isinstance(other, Cost): raise TypeError(f"Unsupported types for '=': {type(self)} and {type(other)}")
@@ -58,9 +75,12 @@ class GemCost:
         if self.blue and not other.blue: return False
         return True
     
+    def __iter__(self): return iter((self.black, self.green, self.orange, self.blue, self.plusone))
+    
     def __int__(self):
-        '''Use only to determine equality and sort order.'''
-        return self.black + self.green * 4 + self.orange * 8 + self.blue * 16 + self.plusone
+        '''Use only to determine equality and sort order. Also used to index for cost image.'''
+        if sum(tuple(self)[1:4]) < 2: return 1 + self.green * 2 + self.orange * 4 + self.blue * 6 + self.plusone
+        return 6 + self.green + self.orange * 2 + self.blue * 3
         
     def __eq__(self, other):
         if not isinstance(other, Cost): raise TypeError(f"Unsupported types for '=': {type(self)} and {type(other)}")
