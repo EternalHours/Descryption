@@ -3,31 +3,87 @@ import pygame as pg
 from scripts.separate_spritesheet import separate_spritesheet
 
 class SigilInfo:
-	def __init__(self, sigil_id, name, scrybes, description, triggers, is_mox, is_conduit, is_active, has_mirror, can_stack):
+	def __init__(self, sigil_id, name, scrybes, description, triggers, is_mox, is_conduit, has_mirror, can_stack):
         # Initialise Attributes:
         def func(*args): pass
         self.sigil_id = sigil_id
         self.name = name
         self.scrybes = scrybes
         self.description = description
-        self.effects = {trigger: func for trigger in triggers}
         self.is_mox = is_mox
         self.is_conduit = is_conduit
-        self.is_active = is_active
+        self.is_power = False
+        self.is_active = False
         self.has_mirror = has_mirror
         self.can_stack = can_stack
-        # Import Sigil Effects:
+        # Derived Attributes:
+        self.effects = {trigger: func for trigger in triggers}
         self.load_effects()
         self.image = None
-        self.mirrored = None
+        self.__mirrored = None
     
     @property
     def triggers(self): return set(self.effects.keys())
     
+    @property
+    def mirrored(self):
+        # Note that the mirrored sprite is for when opponents have sigil on their cards and not for horizontal flipping.
+        if self.__mirrored is None: return self.image
+        return self.__mirrored
+        
+    @property
+    def mirrored(self, image):
+        self.__mirrored = image
+    
     def load_effects(self):
-        sigil = importlib.import_module(f"scripts.sigils.{self.name.lower().replace(" ", "_")}')
+        sigil = importlib.import_module(f"scripts.sigils.{self.name.lower().replace(" ", "_")}")
         for trigger in self.triggers:
-            self.effects[trigger] = getattr(sigil, "on_"+trigger)
+            try: self.effects[trigger] = getattr(sigil, "on_"+trigger)
+            except: print(f"Warning: Could not load effect for trigger, {trigger} of Sigil, {self.name}.")
+
+class PowerSigilInfo:
+    def __init__(self):
+        # Initialise Attributes:
+        def func(*args): return 1
+        self.sigil_id = sigil_id
+        self.name = name
+        self.scrybes = scrybes
+        self.description = description
+        self.is_power = True
+        self.is_active = False
+        # Derived Attributes:
+        self.valuefunc = func
+        self.load_valuefunc()
+        self.image = None
+    
+    def load_valuefunc(self):
+        try:
+            sigil = importlib.import_module(f"scripts.power.{self.name.lower().replace(" ", "_")}")
+            self.valuefunc = getattr(sigil, "get_value")
+        except: print(f"Warning: could not load value function of Power Sigil, {self.name}.")
+
+class ActiveSigilInfo:
+    def __init__(self):
+        # Initialise Attributes:
+        def func(*args): pass
+        self.sigil_id = sigil_id
+        self.name = name
+        self.scrybes = scrybes
+        self.description = description
+        self.is_power = False
+        self.is_active = True
+        # Derived Attributes:
+        self.effect = func
+        self.load_effect()
+        self.image = None
+    
+    def load_effect(self):
+        try:
+            sigil = importlib.import_module(f"scripts.active.{self.name.lower().replace(" ", "_")}")
+            self.effect = getattr(sigil, "on_press")
+        except: print(f"Warning: could not load effect of Active Sigil, {self.name}.")
+    
+        
     
 class RepoSearchSigil:
     def __init__(self):
@@ -145,16 +201,16 @@ class SigilRepo:
         sr.sigils = self.sigils.union(sigilrepo.sigils)
         return sr
         
-    def load_images(self, path, flip):
-        '''Updates all the sigil info with their relevant sprites taken from specified spritesheets.'''
-        sprites = separate_spritesheet(path)
-        flipped = separate_spritesheet(flip)
-        m = len(self.sigils)
-        n = len(sprites)
-        o = len(flipped)
-        if m != n: raise ValueError("Repo and spritesheet have different sizes; cannot collate their images.")
-        if m != o: raise ValueError("Repo and flipped spritesheet have different sizes; cannot collate their images.")
-        for i in range(n):
-            self.sigils[i].image = sprites[i]
-            self.sigils[i].mirrored = sprites[i]
-            if self.sigils[i].has_mirror: self.sigils[i].mirrored = flipped[i]
+    def load_images(self):
+        '''Updates all the sigil info with their relevant sprites taken from spritesheets.'''
+        sprites = separate_spritesheet(os.path.join('images', 'sigils'), (17, 17))
+        flipped = separate_spritesheet(os.path.join('images', 'sigils_flipped'), (17, 17))
+        powers = separate_spritesheet(os.path.join('images', 'power_sigils'), (11, 13))
+        actives = separate_spritesheet(os.path.join('images', 'active_sigils'), (17, 11))
+        if len(sprites) != len(flipped): raise RuntimeError("Sigils and Flipped Sigils spritesheets do not match in size.")
+        for sigil in self.sigils:
+            if sigil.is_active: sigil.image = actives[sigil.sigil_id]
+            elif sigil.is_power: sigil.image = powers[sigil.sigil_id]
+            else:
+                if sigil.has_mirror: sigil.mirrored = flipped[sigil.sigil_id]
+                sigil.image = sprites[sigil.sigil_id]

@@ -6,7 +6,7 @@ class Cost:
     images = None
     
     def load_images()
-        images = separate_spritesheet(os.path.join('images', 'costs.png'))
+        images = separate_spritesheet(os.path.join('images', 'costs.png'), (26, 15))
         binders = ['blood', 'bones', 'gems', 'energy', 'links', 'gold']
         cost_images = {binder: [] for binder in binders}
         for i in range(len(images)):
@@ -110,7 +110,7 @@ class BaseCardInfo:
         self.evolution = evolution
         self.sigil_targets = sigil_targets
         self.__portraitpath = None
-        self.__emissionpath = None
+        self.set_image_paths()
         
     @property
     def portrait(self):
@@ -120,7 +120,10 @@ class BaseCardInfo:
     @property
     def emission(self):
         '''Dynamically loads emission portrait for memory save. Call sparingly.'''
-        return pg.image.load(os.path.join('images', 'portraits', self.__emissionpath))
+        return pg.image.load(os.path.join('images', 'portraits', self.__portraitpath+"_emission"))
+    
+    def set_image_paths(self):
+        self._portrait_path = self.name.lower().replace(" ", "").replace("(", "").replace(")", "")
         
     def __lt__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '<': {type(self)} and {type(other)}.")

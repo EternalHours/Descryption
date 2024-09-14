@@ -1,19 +1,21 @@
 import copy
 from domain.basecard import Cost, BaseCard
 from domain.sigils import SigilGroup
-from domain.traits import Traits
+from domain.traits import TraitGroup
+from data.const import Colour
 
 class RogueCard:
     '''Exists to be a container for attributes of cards which may change across the duration of a Rogue run.'''
     
-    def __init__(self, basecard):
+    def __init__(self, basecard, game):
         # Initialise Attributes:
+        self.game = game
         self.basecard = basecard
         self.__name = None
         self.__cost = None
         self.__tribes = None
         self.sigils = SigilGroup(innate = self.basecard.sigils)
-        self.__traits = None
+        self.__traits = TraitGroup(self.basecard.traits)
         self.__power = None
         self.__health = None
         self.__evolution = None
@@ -86,7 +88,7 @@ class RogueCard:
     @traits.setter
     def traits(self, traits):
         if traits is None: self.__traits = None
-        if not isinstance(traits, set): raise TypeError(f"Could not set traits of RogueCard to object of type {type(traits)}.")
+        if not isinstance(traits, TraitGroup): raise TypeError(f"Could not set traits of RogueCard to object of type {type(traits)}.")
         else: self.__traits = traits
         
     @power.setter
@@ -110,11 +112,28 @@ class RogueCard:
     
     def render(self):
         costicon = self.cost.image
-        cardblank = Traits.get_cardblank(self.traits)
+        cardblank = self.traits.cardblank
         portrait = self.basecard.portrait
+        colour = [Colour.black, Colour.white][self.traits.is_fullart]
+        font = pg.font.Font(os.path.join("fonts", "Marksman.otf"), 16)
+        if isinstance(self.power, int): power = font.render(self.power, False, colour)
+        if isinstance(self.health, int): health = font.render(self.health, False, colour)
         #
-        #   TODO
+        #   TODO: variable power/health stats rendering
         #
+        
+        card = pg.Surface(44, 58)
+        card.blit(cardblank, (2, 2))
+        card.blit(portrait, (3, 3))
+        card.blit(costicon, (card.get_width() - costicon.get_width() - 1, 2))
+        card.blit(power, (2, card.get_height() - power.get_height()))
+        card.blit(health, (card.get_width() - health.get_width(), card.get_height() - health.get_height()))
+        #
+        # TODO: sigil rendering
+        #
+        
+        return card
+        
         
     def copy(self):
         '''Creates a new copy of this rogue card with all the same modifications.'''
