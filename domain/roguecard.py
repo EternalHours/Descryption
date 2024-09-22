@@ -1,4 +1,6 @@
+import os
 import copy
+import pygame as pg
 from domain.basecard import Cost, BaseCard
 from domain.sigils import SigilGroup
 from domain.traits import TraitGroup
@@ -116,18 +118,25 @@ class RogueCard:
         portrait = self.basecard.portrait
         colour = [Colour.black, Colour.white][self.traits.is_fullart]
         font = pg.font.Font(os.path.join("fonts", "Marksman.otf"), 16)
-        if isinstance(self.power, int): power = font.render(self.power, False, colour)
-        if isinstance(self.health, int): health = font.render(self.health, False, colour)
-        #
-        #   TODO: variable power/health stats rendering
-        #
-        
-        card = pg.Surface(44, 58)
+        power, ppos, health, hpos = None, None, None, None
+        if isinstance(self.power, int):
+            power = font.render(self.power, False, colour)
+            ppos = (2, 58 - power.get_height())
+        else:
+            power = self.power.image
+            ppos = (3, 57 - power.get_height())
+        if isinstance(self.health, int):
+            health = font.render(self.health, False, colour)
+            hpos = (44 - health.get_width(), 58 - health.get_height())
+        else:
+            health = self.health.image
+            hpos = (43 - health.get_width(), 57 - health.get_height())
+        card = pg.Surface((44, 58))
         card.blit(cardblank, (2, 2))
         card.blit(portrait, (3, 3))
         card.blit(costicon, (card.get_width() - costicon.get_width() - 1, 2))
-        card.blit(power, (2, card.get_height() - power.get_height()))
-        card.blit(health, (card.get_width() - health.get_width(), card.get_height() - health.get_height()))
+        card.blit(power, ppos)
+        card.blit(health, hpos)
         #
         # TODO: sigil rendering
         #
@@ -151,10 +160,30 @@ class RogueCard:
 class RogueDeck:
     '''Exists as a list of cards accumulated and modified over a single Rogue Run. Only used outside of duels.'''
     
-    def __init__(self):
+    def __init__(self, name=None, scrybe=None, tier=None):
         # Initialise Attributes:
+        self.name = name
+        self.scrybe = scrybe
+        self.tier = tier
         self.side_deck = []
         self.main_deck = []
+        self.__icon = None
+    
+    @property
+    def icon(self):
+        if self.__icon is not None: return self.__icon
+        self.__icon = pg.image.load(os.path.join('images', 'roguedecks', f'{self.name.lower()}.png'))
+        return self.__icon
+    
+    def preview(self):
+        '''Renders deck preview for the selection screen. Call only once per deck.'''
+        offset
+        height = 58
+        width = 44 + (44 + offset) * (len(self.main_deck) - 1)
+        surface = pg.Surface((width, height), pg.SRCALPHA)
+        for i in range(len(self.main_deck)):
+            surface.blit(self.main_deck[i].render(), ((44 + offset) * i, 0))
+        return surface
     
     def add_card(self, card, main=True):
         '''Adds the specified card to the Rogue Deck. Will create a RogueCard to add if BaseCard is supplied.'''

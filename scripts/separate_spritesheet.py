@@ -2,7 +2,7 @@ import pygame as pg
 
 def separate_spritesheet(self, path, sprite_size):
     '''Assumes all spritesheets have margins of 1 px between sprites and against edges.'''
-    path = os.path.join('images')
+    path = os.path.join('images', path)
     sheet = pg.image.load(path).convert_alpha()
     X, Y = sheet.get_width(), sheet.get_height()
     x, y = sprite_size

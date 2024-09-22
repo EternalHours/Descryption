@@ -121,6 +121,7 @@ class TraitGroup:
         
     @property
     def cardblank(self):
+        '''Intensive render, avoid using often.'''
         if self.__cardblank is not None: return self.__cardblank
         images = []
         if self.is_fullart:

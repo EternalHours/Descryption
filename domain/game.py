@@ -2,6 +2,9 @@ import os
 import pygame as pg
 from screeninfo import get_monitors
 from domain.cursor import Cursor
+from traits import TraitRepo
+from basecard import BaseCardRepo
+from sigils import SigilRepo
 
 class Game:
 	def __init__(self, resolution):
@@ -23,6 +26,11 @@ class Game:
         self.window_size = (100, 100)
         self.caption = ""
         self.icon_image_path = ""
+        
+        # Initialise Repositories
+        self.basecards = BaseCardRepo
+        self.traits = TraitRepo
+        self.sigils = SigilRepo
     
     def create_window(self):
         '''Use to reshape/move the window.'''

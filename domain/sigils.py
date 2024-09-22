@@ -1,5 +1,6 @@
 import importlib
 import pygame as pg
+from collections import Counter
 from scripts.separate_spritesheet import separate_spritesheet
 
 class SigilInfo:
@@ -40,6 +41,9 @@ class SigilInfo:
         for trigger in self.triggers:
             try: self.effects[trigger] = getattr(sigil, "on_"+trigger)
             except: print(f"Warning: Could not load effect for trigger, {trigger} of Sigil, {self.name}.")
+            
+    def __repr__(self):
+        return self.name
 
 class PowerSigilInfo:
     def __init__(self):
@@ -62,6 +66,9 @@ class PowerSigilInfo:
             self.valuefunc = getattr(sigil, "get_value")
         except: print(f"Warning: could not load value function of Power Sigil, {self.name}.")
 
+    def __repr__(self):
+        return self.name
+        
 class ActiveSigilInfo:
     def __init__(self):
         # Initialise Attributes:
@@ -83,8 +90,9 @@ class ActiveSigilInfo:
             self.effect = getattr(sigil, "on_press")
         except: print(f"Warning: could not load effect of Active Sigil, {self.name}.")
     
+    def __repr__(self):
+        return self.name
         
-    
 class RepoSearchSigil:
     def __init__(self):
         self.sigil_id = None
@@ -214,3 +222,79 @@ class SigilRepo:
             else:
                 if sigil.has_mirror: sigil.mirrored = flipped[sigil.sigil_id]
                 sigil.image = sprites[sigil.sigil_id]
+
+class SigilInfoGroup:
+    def __init__(self, innate=None, patched=None):
+        # Initialise Attributes
+        self.__innate = None; self.innate = innate
+        self.__patched = None; self.patched = patched
+        
+    @property
+    def innate(self):
+        return self.__innate
+        
+    @property
+    def patched(self):
+        return self.__patched
+        
+    @innate.setter
+    def innate(self, innate=None):
+        if innate is None: return
+        sigils = SigilInfoGroup()
+        for sigil in innate: sigils.add(sigil, "innate")
+        self.__innate = sigils.innate
+    
+    @patched.setter
+    def patched(self, patched=None):
+        if patched is None: return
+        sigils = SigilInfoGroup()
+        for sigil in patched: sigils.add(sigil, "patched")
+        self.__patched = sigils.patched
+    
+    def add(self, sigil, category="patched"):
+        if not isinstance(sigil, SigilInfo): raise TypeError(f"Could not add object of type {type(sigil)} to SigilInfoGroup.")
+        if category.lower() not in ["innate", "patched"]: raise ValueError("Category must be Innate or Patched.")
+        if sigil in self and not sigil.can_stack: raise AttributeError("Sigil already exists within group and cannot stack.")
+        if category.lower() == "innate": self.__innate = sorted(self.__innate + [sigil])
+        else: self.__patched = self.__patched + [sigil]
+        # Note that whilst innate sigils are sorted by id, patched sigils are sorted chronologically.
+    
+    def remove(self, sigil, category="patched"):
+        if sigil not in getattr(self, category.lower()): raise ValueError(f"Sigil not found in category.")
+        if category.lower() not in ["innate", "patched"]: raise ValueError("Category must be Innate or Patched.")
+        if category.lower() == "innate": self.__innate.remove(sigil)
+        else: self.__patched.remove(sigil)
+    
+    def __iter__(self):
+        return iter(self.innate + self.patched)
+    
+    def __lt__(self, other):
+        this = Counter(self)
+        that = Counter(other)
+        le = [this[sigil] <= that[sigil] for sigil in this]
+        eq = [this[sigil] == that[sigil] for sigil in this]
+        return all(le) and not all(eq)
+    
+    def __gt__(self, other):
+        this = Counter(self)
+        that = Counter(other)
+        ge = [this[sigil] >= that[sigil] for sigil in that]
+        eq = [this[sigil] == that[sigil] for sigil in that]
+        return all(ge) and not all(eq)
+
+    def __le__(self, other):
+        this = Counter(self)
+        that = Counter(other)
+        le = [this[sigil] <= that[sigil] for sigil in this]
+        return all(le)
+    
+    def __ge__(self, other):
+        this = Counter(self)
+        that = Counter(other)
+        ge = [this[sigil] >= that[sigil] for sigil in that]
+        return all(ge)
+        
+    def __eq__(self, other):
+        this = Counter(self)
+        that = Counter(self)
+        return this == that
