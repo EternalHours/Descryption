@@ -1,0 +1,48 @@
+﻿DECK_ID,NAME,SCRYBE,TIER,CARD_1,CARD_2,CARD_3
+1,Vanilla,Leshy,0,Stoat,Bull Frog,Wolf
+2,Vanilla,Leshy,0,(Talking) Stoat,Bull Frog,Wolf
+3,Vanilla,Leshy,0,(Talking) Stoat,Stink Bug,Wolf
+4,Vanilla,Leshy,0,(Talking) Stoat,Stink Bug,Stunted Wolf
+5,Blood,Leshy,0,Black Goat,Moose Buck,Mole
+6,Ants,Leshy,1,Ant Queen,Flying Ant,Skunk
+7,Trifurcated,Leshy,2,Mantis God,Ring Worm,Ring Worm
+8,Waterborne,Leshy,3,Kingfisher,Kingfisher,Great Kraken
+9,Bones,Leshy,4,Raccoon,Dire Wolf Pup,Coyote
+10,Free,Leshy,5,Rabbit,Tadpole,Geck
+11,V,Leshy,6,Curious Egg,Curious Egg,Curious Egg
+12,Bone Digger,Grimora,0,Gravedigger,Gravedigger,Gravedigger
+13,Airborne,Grimora,0,The Walkers,Plague Doctor,Raven
+14,Screw,Grimora,1,Animated Dead,Franklyn,Steiner
+15,Wand,Grimora,2,Skelemagus,Cauldron,Cauldron
+16,Blood Sucker,Grimora,3,Night Child,Thrall,Bat
+17,Haunter,Grimora,4,Restless Soul,Wight,Haunted Armor
+18,Pirates,Grimora,5,Scallywagger,Marauder,Fool's Gold
+19,Hallows,Grimora,6,Jack-O-Lantern,Scarecrow,Headless Horseman
+20,Green,Magnificus,0,Junior Sage,Minimage,Green Witch
+21,Green,Magnificus,0,Green Mage,Minimage,Green Witch
+22,Orange,Magnificus,0,Orange Witch,Amateur Mage,Shield Mage
+23,Orange,Magnificus,0,Orange Witch,Orange Mage,Shield Mage
+24,Blue,Magnificus,1,Gem Fiend,Blue Witch,Magick Scholar
+25,Blue,Magnificus,1,Gem Fiend,Blue Witch,Blue Mage
+26,Orlu,Magnificus,2,Master Orlu,Hover Mage,Mage Knight
+27,Bleene,Magnificus,3,Kineticist,Master Bleene,Frantic Mage
+28,Goranj,Magnificus,4,Practice Mage,Buff Mage,Master Goranj
+29,Black,Magnificus,5,Mage Pupil,Cloaked Wizard,Black Witch
+30,Black,Magnificus,5,Black Mage,Cloaked Wizard,Black Witch
+31,Spells,Magnificus,6,Dr. Freckle,Flame Wizard,Spellweaver
+32,Sniper,P03,0,Shield Bot,Sniper Bot,Double Gunner
+33,Brittle,P03,0,Explode Bot,Skel-E-Latcher,Exeskeleton
+34,Conduits,P03,1,Null Conduit,Null Conduit,Splinter Cell
+35,Transformers,P03,2,Friendly Egg,Automaton,Qui77
+36,Depleting,P03,3,Capacitron,Rust Bucket,Spark Plug
+37,Gems,P03,4,Busted 3D Printer,Gembound Ripper,Mox Module
+38,Warmth,P03,5,Steambot,H3at-Sink,Boiler Bot
+39,Leap,P03,6,Curve Hopper,Curve Hopper,L33p Bot
+40,Armored,Galliard,0,Blacksmith,Crucible,White Knight
+41,Sleep,Galliard,0,Daydreamer,Bard,Flying Machine
+42,Burning,Galliard,1,Kiln,Survivor,Archer
+43,Outcast,Galliard,2,Prisoner,Watchdog,Ronin
+44,Handler,Galliard,3,Sinkhole,Falconer,Scuptor
+45,Ruby Heart,Galliard,4,Ruby Golem (Rework),Ruby Golem (Rework),Ruby Golem (Rework)
+46,Windmill,Galliard,5,Sir Quote,Squire,Cavalier
+47,Gold Digger,Galliard,6,Dwarf,Rogue,High Roller

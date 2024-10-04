@@ -4,9 +4,9 @@ from collections import Counter
 from scripts.separate_spritesheet import separate_spritesheet
 
 class SigilInfo:
-	def __init__(self, sigil_id, name, scrybes, description, triggers, is_mox, is_conduit, has_mirror, can_stack):
+    def __init__(self, sigil_id, name, scrybes, description, triggers, is_mox, is_conduit, has_mirror, can_stack):
         # Initialise Attributes:
-        def func(*args): pass
+        func = lambda *args: None
         self.sigil_id = sigil_id
         self.name = name
         self.scrybes = scrybes
@@ -37,7 +37,7 @@ class SigilInfo:
         self.__mirrored = image
     
     def load_effects(self):
-        sigil = importlib.import_module(f"scripts.sigils.{self.name.lower().replace(" ", "_")}")
+        sigil = importlib.import_module(f"scripts.sigils.{self.name.lower().replace(' ', '_')}")
         for trigger in self.triggers:
             try: self.effects[trigger] = getattr(sigil, "on_"+trigger)
             except: print(f"Warning: Could not load effect for trigger, {trigger} of Sigil, {self.name}.")
@@ -62,7 +62,7 @@ class PowerSigilInfo:
     
     def load_valuefunc(self):
         try:
-            sigil = importlib.import_module(f"scripts.power.{self.name.lower().replace(" ", "_")}")
+            sigil = importlib.import_module(f"scripts.power.{self.name.lower().replace(' ', '_')}")
             self.valuefunc = getattr(sigil, "get_value")
         except: print(f"Warning: could not load value function of Power Sigil, {self.name}.")
 
@@ -86,7 +86,7 @@ class ActiveSigilInfo:
     
     def load_effect(self):
         try:
-            sigil = importlib.import_module(f"scripts.active.{self.name.lower().replace(" ", "_")}")
+            sigil = importlib.import_module(f"scripts.active.{self.name.lower().replace(' ', '_')}")
             self.effect = getattr(sigil, "on_press")
         except: print(f"Warning: could not load effect of Active Sigil, {self.name}.")
     
@@ -154,7 +154,7 @@ class SigilRepo:
             if sigil.name == sigil_name: return sigil
         return None
     
-    def __get_search_sigil(self, kwargs):
+    def get_search_sigil(self, kwargs):
         '''Use to convert dictionary of kwargs into a RepoSearchCard object.'''
         attributes = {'sigil_id', 'name', 'scrybes', 'triggers', 'is_mox', 'is_conduit', 'has_mirror', 'can_stack'}
         rss = RepoSearchSigil()
@@ -266,7 +266,7 @@ class SigilInfoGroup:
         else: self.__patched.remove(sigil)
     
     def __iter__(self):
-        return iter(self.innate + self.patched)
+        return iter(sorted(self.innate + self.patched))
     
     def __lt__(self, other):
         this = Counter(self)

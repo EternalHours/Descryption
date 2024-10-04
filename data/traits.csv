@@ -1,0 +1,64 @@
+﻿TRAIT_ID,NAME,DESCRIPTION,HAS_IMAGES,HAS_FULLART_IMAGES
+1,Bloodless,This card has no blood and thus cannot be sacrificed.,TRUE,FALSE
+2,Golden,This card can be discarded to pay for Gold costs.,TRUE,FALSE
+3,Painted,This card may not have been properly inscrybed. Mistakes are possible.,TRUE,TRUE
+4,Stitched,,TRUE,TRUE
+5,Gemified,This card's stats and cost change depending on which gems you possess.,TRUE,FALSE
+6,Sleepy,This card is sleeping and thus its power is obscured. Damage it to wake it up.,FALSE,FALSE
+7,Inky,This card's name is obscured.,FALSE,FALSE
+8,Talking,,FALSE,FALSE
+9,Lesser,,FALSE,FALSE
+10,Unique,,FALSE,FALSE
+11,Wooden,This card becomes Ash when burned.,FALSE,FALSE
+12,Full Art,,FALSE,FALSE
+,Eternal,This card's Unkillable sigil persists when it dies.,,
+,World Eater,This card has +1/+1 for each time a World Eater has died.,,
+,Overeater,This card transforms into a Bloated Stoat if a Warren is sacrificed to play it.,,
+,Pop!,This card is immune to the Glare of Death sigil.,,
+,Caged,This card plays a Wolf that also replaces this card in your deck when it perishes.,,
+,Side Starter,"If this card is not in your starting hand at the start of the game, it moves to your side deck.",,
+,Sleeping Child,This card alternates between being awake and asleep when it is sacrificed.,,
+,Conditioned,This card strikes any card which damages a bell.,,
+,Insatiable,Power this card gains through the Blood Lust sigil persists between duels.,,
+,Inevitable,This card's evolution persists between duels.,,
+,Kyuubi,This card's Loose Tail sigil persists up to eight times.,,
+,Inedible,This card kills the survivors when eaten.,,
+,Overlong,This card's portrait is too long to fit on one card.,,
+,Broken Neck,This card leaves Vertebrae behind it whenever it strafes.,,
+,Companion,This card plays a Blood Hound from your hand or deck when it is played.,,
+,Beast of Burden,This card opens you a pack when it perishes.,,
+,Inscrutible,This card plays another card when it perishes.,,
+,Infestation,This card plays itself from your hand or deck when a Pelt is played.,,
+,Ignition,This card transformes into a Phoenix which also replaces it in your deck when it is bestowed with Eternal Fire.,,
+,Encrusted,"When a gem-costing card is sacrificed to play this one, it gains the corresponding mox sigil(s) and this card's portrait changes to match.",,
+,Do They Dream?,This card is added to your hand whenever an Android falls asleep.,,
+,Chrysomallos,This card yields a Golden Pelt when pelted.,,
+,Scaredy Cat,This card will avoid opposing Canines.,,
+,Sanguivore,"When this card strikes another, this card steals some of its blood value.",,
+,Silencer,"When this card causes another to perish, that card's sigils and traits are ignored and cannot trigger.",,
+,Blindsided,Strikes from other lanes deal 1 additional damage to this card.,,
+,Ageless,This card cannot evolve.,,
+,Hunchman,This card plays itself from your hand if you control a Vampire.,,
+,Spelled End,This card absorbs Lost Limbs when they are played. Its progress persists between duels.,,
+,Ingested,"This card's Frozen Away sigil plays the first card sacrificed to play this one, if there was any.",,
+,Lootable,"This card's Gift Bearer sigil always yields a Sword, Shield or Gold Nugget. ",,
+,Defensive,This card strikes any card which damages a mox.,,
+,Chump,This card will play itself from your hand to block direct strikes.,,
+,Dissassembled,This card shuffles the other three pieces of Edaxio into your main deck at the start of each duel.,,
+,,This card's portrait changes when it loses its Fecundity sigil.,,
+,,This card's portrait changes when it loses its Loose Tail sigil.,,
+,,This card's portrait changes when it is Coloured.,,
+,,This card's portrait changes when it loses its Armored sigil.,,
+,Fisherman,This card can strike waterborne cards.,,
+,,"When a copy of this card is created by the Unkillable sigil, the copy is drafted to your deck.",,
+,Inseperable,This card splits in half at the beginning of the duel. Drawing either draws both. Counts as two cards for trials.,,
+,Superpositioned,This card can be drawn from either deck and its portrait changes depending on the deck it was drawn from.,,
+,,This card's name is in a different font.,,
+,,This card's sigils are obscured.,,
+,,This card perishes and adds a Caliburn to your hand if a non-bloodless card is played adjacent to it.,,
+,,This card wakes each adjacent card when it is played.,,
+,,All Windmills transform into Dragons when this card is played.,,
+,,This card yields a Bear Pelt when it is pelted.,,
+,,This card transforms into a random card when it is drawn.,,
+,,"When this card is sacrificed for another card, that card gains Fledgeling (Mushroom).",,
+,,This card hides as another card in your deck until it is played.,,

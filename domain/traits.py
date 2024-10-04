@@ -7,10 +7,10 @@ class TraitInfo:
         self.trait_id = trait_id
         self.name = name
         self.description = description
-        self.has_images = has_image
+        self.has_images = has_images
         self.has_fullart_images = has_fullart_images
         self.__images = None
-        self.__fullart_images
+        self.__fullart_images = None
     
     @property
     def images(self):

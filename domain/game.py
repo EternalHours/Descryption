@@ -7,7 +7,7 @@ from basecard import BaseCardRepo
 from sigils import SigilRepo
 
 class Game:
-	def __init__(self, resolution):
+	def __init__(self, resolution, savefile):
         # Inititialise Attributes:
         self.game = self
 		self.window = None
@@ -18,6 +18,7 @@ class Game:
         self.running = True
         self.cursor_pos = (0, 0)
         self.cursor = Cursor()
+        self.savefile = savefile
         
         # Attributes for Window Creation:
         self.target_monitor = 0
@@ -28,9 +29,13 @@ class Game:
         self.icon_image_path = ""
         
         # Initialise Repositories
-        self.basecards = BaseCardRepo
-        self.traits = TraitRepo
-        self.sigils = SigilRepo
+        self.basecards = BaseCardRepo()
+        self.traits = TraitRepo()
+        self.sigils = SigilRepo()
+        
+    @property
+    def unlock_manager(self):
+        return self.savefile.unlock_manager
     
     def create_window(self):
         '''Use to reshape/move the window.'''
