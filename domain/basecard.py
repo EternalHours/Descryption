@@ -167,7 +167,9 @@ class BaseCardInfo:
         return pg.image.load(os.path.join('images', 'portraits', self.__portraitpath+"_emission"))
     
     def set_image_path(self):
-        self._portrait_path = self.name.lower().replace(" ", "").replace("(", "").replace(")", "")
+        prefix = "fullpixel_" if "Full Art" in traits else "pixelportrait_"
+        name = self.name.lower().replace(" ", "").replace("(", "").replace(")", "")
+        self._portrait_path = prefix + name
         
     def __lt__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '<': {type(self)} and {type(other)}.")
@@ -297,11 +299,11 @@ class BaseCardRepo:
     
     def match_to(self, **kwargs):
         '''Use to poll the repo for all cards which exactly match the specified criteria.'''
-        results = []
+        results = set()
         rsc = self.__get_search_card(kwargs)
         if not rsc: return self
         for card in self.cards:
-            if rsc == card: results.append(card)
+            if rsc == card: results.add(card)
         bcr = BaseCardRepo()
         bcr.cards = results
         return bcr
@@ -340,19 +342,20 @@ class BaseCardRepo:
         return bcr
         
     def copy(self):
-        bsc = BaseCardRepo()
-        bsc.cards = self.cards
+        bcr = BaseCardRepo()
+        bcr.cards = self.cards
+        return bcr
     
     def __iter__(self):
         return iter(self.cards)
     
     def __add__(self, other):
-        bsc = self.copy()
+        bcr = self.copy()
         if isinstance(other, BaseCardInfo):
-            bsc.add(other)
-            return bsc
-        for card in other: bsc.add(card)
-        return bsc
+            bcr.add(other)
+            return bcr
+        for card in other: bcr.add(card)
+        return bcr
         
         
         
