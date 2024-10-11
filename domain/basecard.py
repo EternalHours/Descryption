@@ -189,6 +189,7 @@ class RepoSearchCard:
     def __init__(self):
         '''Exists to use as comparison to BaseCardInfo for filtering.'''
         self.cost = None
+        self.__cost_type = None
         self.rarity = None
         self.binder = None
         self.scrybes = None
@@ -197,15 +198,34 @@ class RepoSearchCard:
         self.traits = None
         self.power = None
         self.health = None
+    
+    @property
+    def cost_type(self):
+        if self.cost is None: return self.__cost_type
+        return self.cost.cost_type
+    
+    @cost_type.setter
+    def cost_type(self, value):
+        self.cost_type = value
+    
+    def has_any(self, other):
+        '''Used to determine if any of the values for each given attribute are present in both objects.'''
+        if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for 'has_any': {type(self)} and {type(other)}.")
+        attributes = {'scrybes', 'tribes', 'sigils', 'traits'}
+        for attribute in attributes:
+            this = getattr(self, attribute)
+            that = getattr(other, attribute)
+            if not any([value in this for value in that]): return False
+        return True         
         
     def __bool__(self):
         '''Used to determine if a query is trivial. ie. if the search card is empty.'''
-        attributes = {'cost', 'rarity', 'binder', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
-        return any([attribute is not None for attribute in attributes])
+        attributes = {'cost', 'cost_type', 'rarity', 'binder', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        return any([getattr(self, attribute) is not None for attribute in attributes])
 
     def __eq__(self, other):
         if not isinstance(other, BaseCardInfo): raise TypeError(f"Unsupported types for '==': {type(self)} and {type(other)}.")
-        attributes = {'cost', 'rarity', 'binder', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        attributes = {'cost', 'cost_type',  'rarity', 'binder', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         for attribute in attributes:
             this = getattr(self, attribute)
             that = getattr(other, attribute)
@@ -286,7 +306,7 @@ class BaseCardRepo:
     
     def __get_search_card(self, kwargs):
         '''Use to convert dictionary of kwargs into a RepoSearchCard object.'''
-        attributes = {'card_id', 'name', 'cost', 'blood', 'bones', 'energy', 'gems', 'links', 'gold', 'rarity', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
+        attributes = {'card_id', 'name', 'cost', 'cost_type', 'blood', 'bones', 'energy', 'gems', 'links', 'gold', 'rarity', 'scrybes', 'tribes', 'sigils', 'traits', 'power', 'health'}
         rsc = RepoSearchCard()
         for kwarg in kwargs:
             if kwarg not in attributes: raise KeyError(f"Unrecognised attribute of RepoSearchCard: '{kwarg}'.")
@@ -296,7 +316,19 @@ class BaseCardRepo:
                 setattr(cost, kwarg, kwargs[kwarg])
                 rsc.cost = cost
         return rsc
-    
+        
+    def has_any(self, **kwargs):
+        '''Use to poll the repo for all cards with values of attributes which appear in the specified criteria.'''
+        # Use this when looking for all cards which belong to one/more of two scrybes, as at_most will exclude duals which belong to only one them.
+        results = set()
+        rsc = self.__get_search_card(kwargs)
+        if not rsc: return self
+        for card in self.cards:
+            if rsc.has_any(card): results.add(card)
+        bcr = BaseCardRepo()
+        bcr.cards = results
+        return bcr
+        
     def match_to(self, **kwargs):
         '''Use to poll the repo for all cards which exactly match the specified criteria.'''
         results = set()
@@ -340,7 +372,7 @@ class BaseCardRepo:
         bcr = BaseCardRepo()
         bcr.cards = results
         return bcr
-        
+
     def copy(self):
         bcr = BaseCardRepo()
         bcr.cards = self.cards
