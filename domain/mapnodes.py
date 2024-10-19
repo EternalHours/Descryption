@@ -9,12 +9,24 @@ class MapNodeInfo:
         self.pools = pools if pools in kwargs else set()
         
         # Hidden Attributes:
-        self.screen = screen if screen in kwargs else None
+        self.screen = None
+        self.load_screen() 
+        
+    def load_screen(self):
+        sigil = importlib.import_module(f"video.nodes.{self.name.lower().replace(' ', '_')}")
+        try: self.screen = getattr(sigil, self.name.capitalize().replace(" ", ""))
+        except: print(f"Warning: Could not load screen class of Map Node, {self.name}.")
         
 class RepoSearchNode:
     def __init__(self):
         self.scrybes = None
         self.pools = None
+        
+    def match_any(self, other):
+        if not isinstance(other, MapNodeInfo): raise TypeError(f"Unsupported types for 'match_any': {type(self)} and {type(other)}.")
+        if self.scrybes is not None and not any([scrybe in other.scrybes for scrybe in self.scrybes]): return False
+        if self.pools is not None and not any([pool in other.pools for pool in self.pools]): return False
+        return True
         
     def __eq__(self, other):
         if not isinstance(other, MapNodeInfo): raise TypeError(f"Unsupported types for '==': {type(self)} and {type(other)}.")
@@ -45,7 +57,9 @@ class MapNodeRepo:
             for row in reader:
                 node = MapNodeInfo(
                     name = row["NAME"],
-                    node_id = int(row["NODE_ID"])
+                    node_id = int(row["NODE_ID"]),
+                    scrybes = set(row["SCRYBES"].split("; ")),
+                    pools = set(row["POOLS"].split("; "))
                 )
                 self.add(node)
     
@@ -74,6 +88,15 @@ class MapNodeRepo:
         if "scrybes" in kwargs: rsn.scrybes = kwargs["scrybes"]
         if "pools" in kwargs: rsn.pools = kwargs["pools"]
         return rsn
+        
+    def match_any(self, **kwargs):
+        rsn = self.__get_search_node(kwargs)
+        results = {}
+        for node in self.nodes:
+            if rsn.match_any(node): results.add(node)
+        mnr = MapNodeRepo()
+        mnr.nodes = results
+        return mnr
     
     def match_to(self, **kwargs):
         rsn = self.__get_search_node(kwargs)
