@@ -135,7 +135,7 @@ class TraitGroup:
         return cardblank
     
     @property
-    def is_fullart
+    def is_fullart(self):
         return "Full Art" in [trait.name for trait in self]
     
     def iter(self):

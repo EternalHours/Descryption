@@ -2,14 +2,14 @@ import pygame as pg
 from domain.animation import Animation, AnimatedSprite
 
 class Cursor(AnimatedSprite):
-    def __init__(self):
-        super().__init__(self, framerate)
+    def __init__(self, framerate, parent):
+        super().__init__((0, 0), (30, 30), parent)
     
         # Initialise Attributes:
-        self.pos = (0, 0)
         self.state = "POINTER"
         self.hotspots = {}
         self.framerate = framerate
+        self.pos = (0, 0)
     
     @property
     def hotspot(self): return self.hotspots[self.state.lower()]

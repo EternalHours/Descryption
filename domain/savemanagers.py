@@ -4,39 +4,69 @@ from collections import Counter
 class SaveFile:
 
     def create(filename, override=False):
+        path = os.path.join('data', 'saves', f'{filename}.txt')
+        if override and os.path.exists(path): return
         savefile = SaveFile(filename)
-        if override and os.path.exists(savefile.path): return
         savefile.save()
 
-    def load(filename):
+    def load(filename=None):
+        '''Returns the save file with the specified name, or returns the most recent save if no name is given.'''
+        if filename is None:
+            files = [os.path.join('data', 'saves', file) for file in os.listdir(os.path.join('data', 'saves'))]
+            file = max(files, key=os.path.getmtime)
+            filename = os.path.splitext(os.path.basename(file))[0]
         path = os.path.join('data', 'saves', f'{filename}.txt')
-        with file as open(path, 'r'):
+        with open(path, 'r') as file:
+            savefile = SaveFile(filename)
+            data = file.readlines()
             #
             #
             #
-            pass
+        return savefile        
 
-	def __init__(self, name):
+    def __init__(self, name):
         # Initialise Attributes:
         self.name = name
         self.path = os.path.join('data', 'saves', f'{name}.txt')
+        self.__preference_manager = None
         self.__unlock_manager = None
         self.__rogue_manager = None
-    
+        
+    @property
+    def preference_manager(self):
+        if self.__preference_manager is not None: return self.__preference_manager
+        self.__preference_manager = PreferenceManager()
+        return self.__preference_manager
+        
     @property
     def unlock_manager(self):
         if self.__unlock_manager is not None: return self.__unlock_manager
         self.__unlock_manager = UnlockManager()
+        return self.__unlock_manager
+        
+    @property
+    def rogue_manager(self):
+        if self.__rogue_manager is not None: return self.__rogue_manager
+        self.__rogue_manager = RogueManager()
+        return self.__rogue_manager
         
     def save(self):
-        with file as open(path, 'w'):
+        path = os.path.join('data', 'saves', f'{self.name}.txt')
+        with open(path, 'w') as file:
             #
             #
             #
             pass
+
+class PreferenceManager:
+    def __init__(self):
+        # Initialise Attributes
+        self.resolution = (420, 240)
+        self.monitor_offset = (10, 10)
+        self.framerate = 60
             
 class UnlockManager:
-        def __init__(self):
+    def __init__(self):
         
         # ROGUE
         self.roguetiers = {scrybe: 0 for scrybe in {"Leshy", "Grimora", "Magnificus", "P03", "Galliard", "Challenge"}}

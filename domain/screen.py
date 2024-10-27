@@ -12,13 +12,6 @@ class Screen:
         
     @property
     def game(self): return self.parent.game
-    
-    @property
-    def cursor_pos(self):
-        '''Use to determine cursor pos relative to this screen's origin.'''
-        u, v = self.parent.cursor_pos
-        x, y = self.pos
-        return (u - x, v - y)
         
     @property
     def mouse_over(self):

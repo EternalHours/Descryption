@@ -2,37 +2,55 @@ import os
 import pygame as pg
 from screeninfo import get_monitors
 from domain.cursor import Cursor
-from traits import TraitRepo
-from basecard import BaseCardRepo
-from sigils import SigilRepo
+from domain.traits import TraitRepo
+from domain.basecard import BaseCardRepo
+from domain.sigils import SigilRepo
 
 class Game:
-	def __init__(self, resolution, savefile):
+    def __init__(self, savefile):
+        resolution = savefile.preference_manager.resolution
+        framerate = savefile.preference_manager.framerate
+        monitor_offset = savefile.preference_manager.monitor_offset
+    
         # Inititialise Attributes:
         self.game = self
-		self.window = None
-        self.surface = pg.Surface(resolution)
+        self.__window = None
+        self.surface = pg.Surface((420, 240))
         self.scale_factor = (1, 1)
-        self.active_screens = None
+        self.active_screen = None
         self.inactive_screens = []
         self.running = True
         self.cursor_pos = (0, 0)
-        self.cursor = Cursor()
+        self.__cursor = None
         self.savefile = savefile
+        self.clock = pg.time.Clock()
+        self.framerate = framerate
         
         # Attributes for Window Creation:
         self.target_monitor = 0
-        self.monitor_offset = [0, 30]
+        self.monitor_offset = monitor_offset
         self.fullscreen = None
-        self.window_size = (100, 100)
-        self.caption = ""
-        self.icon_image_path = ""
+        self.window_size = resolution
+        self.caption = "Descryption"
+        self.icon_image_path = os.path.join('images', 'icon.png')
         
         # Initialise Repositories
         self.basecards = BaseCardRepo()
         self.traits = TraitRepo()
         self.sigils = SigilRepo()
+    
+    @property
+    def cursor(self):
+        if self.__cursor is not None: return self.__cursor
+        self.__cursor = Cursor(self.framerate, self)
+        return self.__cursor
         
+    @property
+    def window(self):
+        if self.__window is not None: return self.__window
+        self.create_window()
+        return self.__window
+    
     @property
     def unlock_manager(self):
         return self.savefile.unlock_manager
@@ -40,12 +58,12 @@ class Game:
     def create_window(self):
         '''Use to reshape/move the window.'''
         os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % tuple(self.monitor_offset)
-        if self.fullscreen: self.window = pg.display.set_mode((info.current_w, info.current_h), pg.FULLSCREEN, display=self.target_monitor)
-        else: self.window = pg.display.set_mode(self.window_size, display=self.target_monitor) 
+        if self.fullscreen: self.__window = pg.display.set_mode((info.current_w, info.current_h), pg.FULLSCREEN, display=self.target_monitor)
+        else: self.__window = pg.display.set_mode(self.window_size, display=self.target_monitor) 
         pg.display.set_caption(self.caption)
         pg.display.set_icon(pg.image.load(self.icon_image_path).convert_alpha())
-        w1, w2 = self.window.get_width(), self.surface.get_width()
-        h1, h2 = self.window.get_height(), self.surface.get_height()
+        w1, w2 = self.__window.get_width(), self.surface.get_width()
+        h1, h2 = self.__window.get_height(), self.surface.get_height()
         self.scale_factor = (w1/w2, h1/h2)
         
     def get_monitor_offset(self, target_monitor):
@@ -54,7 +72,7 @@ class Game:
         widths = [monitor.width for monitor in monitors]
         return sum(widths)
 
-    def set_active_screen(screen):
+    def set_active_screen(self, screen):
         '''Use to toggle the active screen to the one specified.'''
         if screen is self.active_screen: raise KeyError(f"Screen already active: {screen}")
         if not screen in self.inactive_screens: raise KeyError(f"Unopened Screen: {screen}")
@@ -65,7 +83,7 @@ class Game:
     
     def events(self):
         '''Handles the events phase of the primary loop.'''
-        self.cursor_pos = self.cursor.get_pos()
+        self.cursor_pos = self.cursor.pos
         keys = pg.key.get_pressed()
         events = pg.event.get()
         for event in events:
@@ -98,6 +116,15 @@ class Game:
         
     def main(self):
         while self.running:
+            self.clock.tick(self.framerate)
             self.events()
             self.updates()
             self.draw()
+        pg.quit()
+            
+    def apply_prefs(self):
+        self.window_size = self.savefile.preference_manager.resolution
+        self.framerate = self.savefile.preference_manager.framerate
+        self.monitor_offset = self.savefile.preference_manager.monitor_offset
+        self.create_window()
+        

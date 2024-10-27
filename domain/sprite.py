@@ -8,8 +8,7 @@ class Sprite(pg.sprite.Sprite):
         self.parent = parent
         self.surfaces = {False: pg.Surface(size), True: pg.Surface(size)}
         self.size = size
-        self.rect = pg.Rect(size)
-        self.rect.top_left = pos
+        self.rect = pg.Rect(pos, size)
         self.cursor_state = None
     
     @property
@@ -24,10 +23,10 @@ class Sprite(pg.sprite.Sprite):
     def surface(self): return self.surfaces[self.moused_over]
     
     @property
-    def pos(self): return self.rect.top_left
+    def pos(self): return self.rect.topleft
         
     @pos.setter
-    def pos(self, pos): self.rect.top_left = pos
+    def pos(self, pos): self.rect.topleft = pos
     
     def on_left_click(self):
         '''Exists to be overridden. Will be called if the sprite is left-clicked.'''
