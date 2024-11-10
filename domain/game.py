@@ -1,4 +1,6 @@
 import os
+import time
+import multiprocessing
 import pygame as pg
 from screeninfo import get_monitors
 from domain.cursor import Cursor
@@ -11,6 +13,7 @@ class Game:
         resolution = savefile.preference_manager.resolution
         framerate = savefile.preference_manager.framerate
         monitor_offset = savefile.preference_manager.monitor_offset
+        fullscreen = savefile.preference_manager.fullscreen
     
         # Inititialise Attributes:
         self.game = self
@@ -29,7 +32,7 @@ class Game:
         # Attributes for Window Creation:
         self.target_monitor = 0
         self.monitor_offset = monitor_offset
-        self.fullscreen = None
+        self.fullscreen = fullscreen
         self.window_size = resolution
         self.caption = "Descryption"
         self.icon_image_path = os.path.join('images', 'icon.png')
@@ -58,7 +61,9 @@ class Game:
     def create_window(self):
         '''Use to reshape/move the window.'''
         os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % tuple(self.monitor_offset)
-        if self.fullscreen: self.__window = pg.display.set_mode((info.current_w, info.current_h), pg.FULLSCREEN, display=self.target_monitor)
+        if self.fullscreen:
+            monitor = get_monitors()[self.target_monitor]; monitor_size = monitor.width, monitor.height
+            self.__window = pg.display.set_mode((monitor_size), pg.FULLSCREEN, display=self.target_monitor)
         else: self.__window = pg.display.set_mode(self.window_size, display=self.target_monitor) 
         pg.display.set_caption(self.caption)
         pg.display.set_icon(pg.image.load(self.icon_image_path).convert_alpha())
@@ -98,6 +103,9 @@ class Game:
                 self.target_monitor = (self.target_monitor + 1) % len(get_monitors())
                 self.monitor_offset[0] = self.get_monitor_offset(self.target_monitor)
                 self.create_window()
+            elif ALT and keys[pg.K_RETURN]:
+                self.fullscreen = not self.fullscreen
+                self.create_window()
         self.active_screen.events(events)
         return
         
@@ -110,10 +118,14 @@ class Game:
         '''Handles the draw phase of the primary loop.'''
         self.surface.fill((0, 0, 0))
         self.active_screen.draw(self.surface)
-        self.window.blit(self.surface, (0, 0))
+        if self.fullscreen:
+            monitor = get_monitors()[self.target_monitor]; monitor_size = monitor.width, monitor.height
+            surface = pg.transform.scale(self.surface, monitor_size)
+        else: surface = pg.transform.scale(self.surface, (self.window_size))
+        self.window.blit(surface, (0, 0))
         pg.display.flip()
         return
-        
+    
     def main(self):
         while self.running:
             self.clock.tick(self.framerate)

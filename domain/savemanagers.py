@@ -19,7 +19,7 @@ class SaveFile:
         with open(path, 'r') as file:
             savefile = SaveFile(filename)
             data = file.readlines()
-            #
+            savefile.preference_manager.parse(data[0])
             #
             #
         return savefile        
@@ -53,7 +53,7 @@ class SaveFile:
     def save(self):
         path = os.path.join('data', 'saves', f'{self.name}.txt')
         with open(path, 'w') as file:
-            #
+            file.write(str(self.preference_manager) + "\n")
             #
             #
             pass
@@ -62,9 +62,25 @@ class PreferenceManager:
     def __init__(self):
         # Initialise Attributes
         self.resolution = (420, 240)
-        self.monitor_offset = (10, 10)
+        self.monitor_offset = [0, 30]
         self.framerate = 60
-            
+        self.fullscreen = False
+        self.palette = 1
+    
+    def __str__(self):
+        string = ""
+        nums = self.resolution + tuple(self.monitor_offset) + (self.framerate, int(self.fullscreen), self.palette)
+        string += "".join([f"{num} " for num in nums])
+        return string
+    
+    def parse(self, string):
+        nums = [int(num) for num in string.split(" ")[:-1]]
+        self.resolution = (nums[0], nums[1])
+        self.monitor_offset = [nums[2], nums[3]]
+        self.framerate = nums[4]
+        self.fullscreen = bool(nums[5])
+        self.palette = nums[6]
+    
 class UnlockManager:
     def __init__(self):
         

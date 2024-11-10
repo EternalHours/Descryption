@@ -43,8 +43,10 @@ class Animation:
         # Assumes the duration is larger than the animation length.
         if duration == len(self): return self.frames
         stretch = duration // len(self)
-        frames = self.frames * stretch
+        frames = []
+        for frame in self.frames: frames += [frame] * stretch
         remainder = duration - len(frames)
+        if remainder == 0: return frames
         step = duration // remainder
         anim_frames = []
         for i in range(len(frames)):
@@ -62,10 +64,18 @@ class AnimatedSprite(Sprite):
         super().__init__(pos, size, parent)
         
         # Initialise Attributes:
-        self.default_image = pg.Surface(size).convert_alpha()
+        self.default_image = pg.Surface(size, pg.SRCALPHA)
         self.animations = {}
         self.frame_queue = []
-        self.paused = False
+        self.anim_paused = False
+    
+    @property
+    def surface(self):
+        return self.__surface
+    
+    @surface.setter
+    def surface(self, surface):
+        self.__surface = surface
     
     def on_idle(self):
         '''Exists to be overriden. Will be called every frame whilst sprite is idle.'''
@@ -75,7 +85,7 @@ class AnimatedSprite(Sprite):
         if not animation in self.animations.values(): raise ValueError(f"Unrecognised Animation of {self}: {animation}")
         if not isinstance(animation, Animation): raise TypeError(f"Animation type unrecognised: {type(animation)}")
         if duration is None: duration = len(animation)
-        frames = animation.fit_duration
+        frames = animation.fit_duration(duration)
         self.frame_queue += frames
     
     def play_animation(self, animation, duration=None):
@@ -83,7 +93,7 @@ class AnimatedSprite(Sprite):
             self.stop_animation()
             self.queue_animation(animation, duration)
             self.anim_paused = False
-        except Error as e: raise e
+        except Exception as e: raise e
     
     def stop_animation(self):
         self.frame_queue = []
@@ -91,14 +101,14 @@ class AnimatedSprite(Sprite):
         
     def is_idle(self):
         '''Use to determine whether the sprite has naturally run out of frames and should call its on_idle.'''
-        return len(self.frame_queue) == 0 and self.anim_paused
+        return len(self.frame_queue) == 0 and not self.anim_paused
         
     def update_frame(self):
         '''Use during the updates phase to determine the image to display during the draw phase.'''
         if len(self.frame_queue) == 0 or self.anim_paused: self.surface = self.default_image
         else: self.surface = self.frame_queue.pop(0)
     
-    def update(self):
+    def updates(self):
         '''Overridden updates loop.'''
         super().updates()
         if self.is_idle: self.on_idle()

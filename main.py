@@ -8,11 +8,11 @@ pg.init()
 
 # Load the most recent save file or create one if none exists.
 savefile = None
-datetime = datetime.now().strftime('%Y%m%d%H%M%S')
+dtstring = datetime.now().strftime('%Y%m%d%H%M%S')
 try: savefile = SaveFile.load()
 except Exception as e:
-    SaveFile.create(datetime, override=True)
-    savefile = SaveFile.load(datetime)
+    SaveFile.create(dtstring, override=True)
+    savefile = SaveFile.load(dtstring)
     print(e)
 
 # Ready game with loaded save file.

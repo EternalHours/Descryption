@@ -6,27 +6,45 @@ class Sprite(pg.sprite.Sprite):
         
         # Initialise Attributes:
         self.parent = parent
-        self.surfaces = {False: pg.Surface(size), True: pg.Surface(size)}
-        self.size = size
         self.rect = pg.Rect(pos, size)
         self.cursor_state = None
+        self.visible = True
     
     @property
-    def game(self): return self.parent.game
+    def surface(self):
+        if self.__surface is not None: return self.__surface
+        self.__surface = pg.Surface(self.size, pg.SRCALPHA)
+        return self.__surface
+    
+    @surface.setter
+    def surface(self, surface):
+        if not isinstance(surface, pg.Surface): raise TypeError(f'Could not set surface of sprite to object of type {type(surface)}')
+        self.__surface = surface
+    
+    @property
+    def game(self):
+        return self.parent.game
     
     @property
     def moused_over(self):
         '''Use to determine if the cursor is placed over the sprite.'''
-        return self.rect.collidepoint(self.parent.cursor)
+        return self.rect.collidepoint(self.parent.cursor_pos)
     
     @property
-    def surface(self): return self.surfaces[self.moused_over]
-    
+    def pos(self):
+        return self.rect.topleft
+        
     @property
-    def pos(self): return self.rect.topleft
+    def size(self):
+        return self.rect.size
         
     @pos.setter
-    def pos(self, pos): self.rect.topleft = pos
+    def pos(self, pos):
+        self.rect.topleft = pos
+        
+    @size.setter
+    def size(self, size):
+        self.rect.size = size
     
     def on_left_click(self):
         '''Exists to be overridden. Will be called if the sprite is left-clicked.'''
@@ -45,6 +63,10 @@ class Sprite(pg.sprite.Sprite):
         if event.type != pg.MOUSEBUTTONDOWN: return False
         if event.button != button: return False
         return self.moused_over
+    
+    def get_palette(self):
+        '''Gets the colour palette from preferences.'''
+        return self.parent.get_palette()
         
     def events(self, events):
         for event in events:
@@ -54,7 +76,18 @@ class Sprite(pg.sprite.Sprite):
                 if event.button == 3: self.on_right_click()
             
     def updates(self):
-        if self.mouse_over: self.game.cursor.state = self.cursor_state
+        try:
+            if self.moused_over: self.game.cursor.state = self.cursor_state
+        except: pass
         
     def draw(self, surface):
-        surface.blit(self.surface, self.pos)
+        if self.visible: surface.blit(self.surface, self.pos)
+
+class HighlightableSprite(Sprite):
+    def __init__(self, pos, size, parent):
+        super().__init__(pos, size, parent)
+        self.surfaces = {False: pg.Surface(size), True: pg.Surface(size)}
+        
+    @property
+    def surface(self): return self.surfaces[self.moused_over]
+    

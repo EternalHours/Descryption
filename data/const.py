@@ -1,7 +1,7 @@
 class Colour:
     # Block Colours:
-	black = (0, 0, 0)
-	white = (255, 255, 255)
+    black = (0, 0, 0)
+    white = (255, 255, 255)
     
     # Theme Colours
     kaycee_red = (144, 42, 53)
@@ -46,9 +46,15 @@ class Colour:
     gold = (240, 192, 48)
     dark_gold = (188, 126, 16)
     
-    class palette:
-        Leshy = {'Trim': Colour.orange, 'Light Trim': Colour.light_orange, 'Block': Colour.brown, 'Light Block': Colour.light_brown, 'Dark Block': Colour.dark_brown, 'Background': Colour.dark_brown}
-        Grimora = {'Trim': Colour.green, 'Light Trim': Colour.light_green, 'Block': Colour.blue, 'Light Block': Colour.light_blue, 'Dark Block': Colour.dark_blue, 'Background': Colour.dark_blue}
-        #Magnificus = {'Trim', 'Light Trim', 'Block', 'Light Block', 'Dark Block', 'Background'}
-        P03 = {'Trim': Colour.energy_teal, 'Light Trim': Colour.light_teal, 'Block': Colour.grey, 'Light Block': Colour.light_grey, 'Dark Block': Colour.dark_grey, 'Background': Colour.dark_grey}
-        Moon = {'Trim', 'Light Trim', 'Block', 'Light Block', 'Dark Block', 'Background'}
+class ColourPalette:
+    Leshy = {'Dark Trim': Colour.orange, 'Light Trim': Colour.light_orange, 'Block': Colour.brown, 'Light Block': Colour.light_brown, 'Dark Block': Colour.dark_brown, 'Background': Colour.dark_brown}
+    Grimora = {'Dark Trim': Colour.green, 'Light Trim': Colour.light_green, 'Block': Colour.blue, 'Light Block': Colour.light_blue, 'Dark Block': Colour.dark_blue, 'Background': Colour.dark_blue}
+    #Magnificus = {'Dark Trim', 'Light Trim', 'Block', 'Light Block', 'Dark Block', 'Background'}
+    P03 = {'Dark Trim': Colour.energy_teal, 'Light Trim': Colour.light_teal, 'Block': Colour.grey, 'Light Block': Colour.light_grey, 'Dark Block': Colour.dark_grey, 'Background': Colour.dark_grey}
+    Moon = {'Dark Trim', 'Light Trim', 'Block', 'Light Block', 'Dark Block', 'Background'}
+    by_index = {1: Leshy,
+                2: Grimora,
+                #3: Magnificus,
+                4: P03,
+                #5: Galliard,
+                6: Moon}
