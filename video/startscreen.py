@@ -160,7 +160,7 @@ class GlitchedTitle(AnimatedSprite):
         self.done = False
         
     def load_animation(self):
-        path = os.path.join('images', 'glitchlogo.gif')
+        path = os.path.join('images', 'menu', 'glitchlogo.gif')
         anim = Animation()
         anim.load_from_gif(path)
         self.animations["idle"] = anim

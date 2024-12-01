@@ -7,12 +7,20 @@ class Cursor(AnimatedSprite):
     
         # Initialise Attributes:
         self.state = "POINTER"
-        self.hotspots = {}
+        self.hotspots = {"POINTER": (0, 0)}
         self.framerate = framerate
-        self.pos = (0, 0)
+        self.__pos = (0, 0)
     
     @property
-    def hotspot(self): return self.hotspots[self.state.lower()]
+    def hotspot(self):
+        try: return self.hotspots[self.state.upper()]
+        except: return (0, 0)
+    
+    @property
+    def pos(self):
+        u, v = pg.mouse.get_pos()
+        x, y = self.hotspot
+        return (u - x, v - y)
     
     def add(self, name, hotspot):
         if name.upper() in self.animations: raise KeyError("Cursor already loaded!")
@@ -25,7 +33,4 @@ class Cursor(AnimatedSprite):
         self.play_animation(animation, self.framerate)
     
     def updates(self):
-        u, v = pg.mouse.get_pos()
-        x, y = self.hotspot
-        self.pos = (u - x, v - y)
         super().updates()
