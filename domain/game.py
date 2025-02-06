@@ -88,7 +88,12 @@ class Game:
     
     def events(self):
         '''Handles the events phase of the primary loop.'''
-        self.cursor_pos = self.cursor.pos
+        if not self.fullscreen: self.cursor_pos = self.cursor.pos
+        else:
+            x, y = pg.mouse.get_pos()
+            x = x // self.scale_factor[0]
+            y = y // self.scale_factor[1]
+            self.cursor_pos = (x, y)
         keys = pg.key.get_pressed()
         events = pg.event.get()
         for event in events:
@@ -120,8 +125,13 @@ class Game:
         self.active_screen.draw(self.surface)
         if self.fullscreen:
             monitor = get_monitors()[self.target_monitor]; monitor_size = monitor.width, monitor.height
+            self.cursor.updates()
+            self.cursor.draw(self.surface)
             surface = pg.transform.scale(self.surface, monitor_size)
-        else: surface = pg.transform.scale(self.surface, (self.window_size))
+        else:
+            self.cursor.updates()
+            self.cursor.draw(self.surface)
+            surface = pg.transform.scale(self.surface, (self.window_size))
         self.window.blit(surface, (0, 0))
         pg.display.flip()
         return
@@ -140,3 +150,4 @@ class Game:
         self.monitor_offset = self.savefile.preference_manager.monitor_offset
         self.create_window()
         
+

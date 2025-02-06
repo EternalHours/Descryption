@@ -22,3 +22,8 @@ start = StartScreen(game)
 start.open()
 
 game.main()
+
+def display(surface):
+    w = pg.display.set_mode(surface.get_size())
+    w.blit(surface, (0, 0))
+    pg.display.flip()

@@ -5,6 +5,7 @@ class Sprite(pg.sprite.Sprite):
         super().__init__()
         
         # Initialise Attributes:
+        self.__surface = None
         self.parent = parent
         self.rect = pg.Rect(pos, size)
         self.cursor_state = None

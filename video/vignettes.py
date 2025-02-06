@@ -23,6 +23,9 @@ class Scanlines(Sprite):
     def draw(self, surface):
         super().draw(surface)
         
+    def __repr__(self):
+        return "Scanlines"
+        
 class StaticVignette(Sprite):
     def __init__(self, parent):
         self.parent = parent
@@ -51,6 +54,9 @@ class StaticVignette(Sprite):
         
     def draw(self, surface):
         super().draw(surface)
+        
+    def __repr__(self):
+        return "Static"
 
 class ShadowVignette(Sprite):
     def __init__(self, parent, tol=40):
@@ -73,3 +79,6 @@ class ShadowVignette(Sprite):
                 a = shade(x, y)
                 surface.set_at((x, y), (0, 0, 0, a))
         self.surface = surface
+        
+    def __repr__(self):
+        return "Shadow"

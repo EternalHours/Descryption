@@ -12,7 +12,7 @@ class Animation:
         '''Use to load all images in a given directory into the animation.'''
         # Path should be to a folder of images representing unique animation frames.
         self.frames = []
-        for filename in sort(os.listdir(path)):
+        for filename in sorted(os.listdir(path)):
             if filename.endswith((".png", ".jpg")):
                 image = pg.image.load(os.path.join(path, filename))
                 image.convert_alpha()
@@ -69,14 +69,6 @@ class AnimatedSprite(Sprite):
         self.frame_queue = []
         self.anim_paused = False
     
-    @property
-    def surface(self):
-        return self.__surface
-    
-    @surface.setter
-    def surface(self, surface):
-        self.__surface = surface
-    
     def on_idle(self):
         '''Exists to be overriden. Will be called every frame whilst sprite is idle.'''
         pass
@@ -105,13 +97,16 @@ class AnimatedSprite(Sprite):
         
     def update_frame(self):
         '''Use during the updates phase to determine the image to display during the draw phase.'''
-        if len(self.frame_queue) == 0 or self.anim_paused: self.surface = self.default_image
-        else: self.surface = self.frame_queue.pop(0)
+        if len(self.frame_queue) == 0 or self.anim_paused:
+            self.surface = self.default_image
+        else:
+            self.surface = self.frame_queue.pop(0)
+            print(len(self.frame_queue), self.is_idle())
     
     def updates(self):
         '''Overridden updates loop.'''
         super().updates()
-        if self.is_idle: self.on_idle()
+        if self.is_idle(): self.on_idle()
         self.update_frame()
             
             
